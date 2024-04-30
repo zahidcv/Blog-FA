@@ -18,7 +18,7 @@ db_dependency = Annotated[dict, Depends(get_db)]
 
 pwd_cxt = CryptContext(schemes=['bcrypt'])
 
-@router.post('/create', response_model=schemas.ShowUser)
+@router.post('/create', response_model=schemas.ShowUser, status_code=status.HTTP_201_CREATED)
 def create_user(request: schemas.User, db: Session = Depends(get_db)):
     hashedPassword = pwd_cxt.hash(request.password)
     new_user = models.User(email = request.email, password = hashedPassword)

@@ -13,7 +13,7 @@ from ..config import settings
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
-
+ACCESS_TOKEN_EXPIRATION_MINUTES = settings.access_token_expiration_minutes
 
 
 router = APIRouter(
@@ -24,17 +24,17 @@ pwd_cxt = CryptContext(schemes=['bcrypt'])
 oauth2bearer = OAuth2PasswordBearer(tokenUrl='login')
 db_dependency = Annotated[dict, Depends(database.get_db)]
 
-@router.post('/login')
+@router.post('/login', status_code=status.HTTP_200_OK)
 def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db:Session = Depends(database.get_db)):
     user = authenticate_user(form_data.username, form_data.password, db)
     print(user)
-    token = create_access_token(user.email, user.id, timedelta(minutes=20))
+    token = create_access_token(user.email, user.id)
 
     return {'access_token': token, 'token_type': 'bearer'}
 
 
-def create_access_token(email: str, id: int, expires_delta: timedelta):
-    expires = datetime.utcnow() + expires_delta
+def create_access_token(email: str, id: int):
+    expires = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
     encode = {'email': email, 'exp': expires, 'id': id}
          
     return jwt.encode(encode, SECRET_KEY, algorithm = ALGORITHM)

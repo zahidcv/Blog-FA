@@ -53,6 +53,7 @@ def delete(id, current_user: user_dependency, db: Session = Depends(get_db)):
     if b.user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='It-s not your blog')
     
+    
     bquery.delete()
     db.commit()
     return 'deleted'
@@ -73,7 +74,7 @@ def update(id, current_user: user_dependency, request: schemas.Blog, db: Session
 @router.post('/vote/', )
 def vote(vote: schemas.Vote, current_user: user_dependency, db: Session = Depends(get_db)):
     
-    vote_query = db.query(models.Votes).filter(models.Votes.user_id == current_user.id, models.Votes.post_id == vote.post_id)
+    vote_query = db.query(models.Vote).filter(models.Vote.user_id == current_user.id, models.Vote.post_id == vote.post_id)
     
     found_vote = vote_query.first()
     
@@ -82,7 +83,7 @@ def vote(vote: schemas.Vote, current_user: user_dependency, db: Session = Depend
             print("vote found")
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='You already voted this post')
         
-        new_vote = models.Votes(post_id = vote.post_id, user_id = current_user.id)
+        new_vote = models.Vote(post_id = vote.post_id, user_id = current_user.id)
         print('88888888888',new_vote)
         db.add(new_vote)
         db.commit()
@@ -94,3 +95,7 @@ def vote(vote: schemas.Vote, current_user: user_dependency, db: Session = Depend
         vote_query.delete(synchronize_session=False)
         db.commit()
         return {'message': "Successfully deleted vote."}
+    
+
+def add(num1:int, num2:int):
+    return num1+num2 
