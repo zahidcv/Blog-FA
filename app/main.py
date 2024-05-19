@@ -16,8 +16,8 @@ app.add_middleware(
     allow_methods = ['*'],
     allow_headers = ['*']
 )
-# models.Base.metadata.create_all(engine)
-# print('*****************',settings.database_hostname)
+models.Base.metadata.create_all(engine)
+print('*****************',settings.database_hostname)
 app.include_router(blog.router)
 app.include_router(user.router)
 app.include_router(auth.router)
